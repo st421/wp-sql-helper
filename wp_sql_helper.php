@@ -104,6 +104,13 @@ function get_item_by_id($table_name, $id) {
 	return $item[0];
 }
 
+function get_item_by_param($table_name, $param_name, $param_value) {
+	global $wpdb;
+	$val = $wpdb->get_results('SELECT value FROM ' . $table_name . ' WHERE ' . $param_name . '=' . $param_value . ';');
+	$val = $val[0];
+	return $val->value;
+}
+
 function delete_table_item($table_name, $post_data) {
 	$id = $post_data['id'];
 	$query = "DELETE FROM " . $table_name . " WHERE id='" . $id . "';";
