@@ -92,6 +92,11 @@ function get_all_by_date($table_name) {
 	return $wpdb->get_results("SELECT * FROM " . $table_name . " ORDER BY date ASC;");
 }
 
+function get_all($table_name) {
+	global $wpdb;
+	return $wpdb->get_results("SELECT * FROM " . $table_name . ";");
+}
+
 function get_recent_items($table_name, $num_items) {
 	global $wpdb;
 	$query = "SELECT * FROM " . $table_name . " WHERE date >= DATE_FORMAT(NOW(),'%Y-%m-%d') ORDER BY date ASC LIMIT " . $num_items . ";";
@@ -109,6 +114,13 @@ function get_item_by_param($table_name, $param_name, $param_value) {
 	$val = $wpdb->get_results('SELECT value FROM ' . $table_name . ' WHERE ' . $param_name . '=' . $param_value . ';');
 	$val = $val[0];
 	return $val->value;
+}
+
+function get_table_count($table_name) {
+	global $wpdb;
+	$result = $wpdb->get_results("SELECT COUNT(*) as the_count FROM " . $table_name . ";");
+	$result = $result[0];
+	return $result->the_count;
 }
 
 function delete_table_item($table_name, $post_data) {
