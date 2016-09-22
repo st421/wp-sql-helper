@@ -1,30 +1,65 @@
 <?php 
 
+/*
+  A group of helper methods intended for use with displaying database 
+  information (and other miscellaneous objects) in Wordpress plugins.
+*/
+
+// include database helper functions
 include('wp_sql_helper.php');
 
-function get_basic_table($table_name, $table_params, $id) {
-	return get_table($table_params, get_all($table_name), $id);
+/*
+  Helper function that returns a string containing an HTML table holding
+  all entries in the given table. The "basic" table includes all fields 
+  in the DB table.
+*/
+function get_basic_table($table_name, $table_params, $html_id) {
+	return get_table($table_params, get_all($table_name), $html_id);
 }
 
-function get_admin_table($table_name, $table_params, $id, $edit_param='', $edit_page='') {
-	return get_table($table_params, get_all($table_name), $id, true, $edit_param, $edit_page);
+/*
+  Helper function that returns a string containing an HTML table holding
+  all entries in the given table, plus an optional parameter that can be made
+  a link to an edit page for the entry. By default, includes a column that allows
+  entries to be deleted from the table. 
+*/
+function get_admin_table($table_name, $table_params, $html_id, $edit_param='', $edit_page='') {
+	return get_table($table_params, get_all($table_name), $html_id, true, $edit_param, $edit_page);
 }
 
-function get_settings_table($table_name, $table_params, $id, $edit_param='', $edit_page='') {
-  return get_table($table_params, get_all($table_name), $id, false, $edit_param, $edit_page);
+/*
+  Helper function that returns a string containing an HTML table holding
+  all entries in the given table, plus an optional parameter that can be made
+  a link to an edit page for the entry but does not include the option to 
+  delete entries (if the table contains plugin settings, even the admin shouldn't
+  be able to just delete settings).
+*/
+function get_settings_table($table_name, $table_params, $html_id, $edit_param='', $edit_page='') {
+  return get_table($table_params, get_all($table_name), $html_id, false, $edit_param, $edit_page);
 }
 
-function get_table($table_params, $items, $id, $delete_col=false, $edit_param='', $edit_page='') {
-	$table = '<table id="' . $id . '" class="table table-responsive table-hover">' . get_table_header($table_params, $delete_col) . '<tbody>';
+/*
+  Helper function that returns a string containing an HTML table holding
+  all entries in the given table, configurable via the following parameters:
+  -$table_params: the table fields to include in the HTML table
+  -$items: the table items to display
+  -$html_id: the ID to place on the HTML table
+  -$delete_col: (optional) whether or not to include a column allowing the user to delete an entry
+  -$edit_param: (optional) which parameter to add an "edit" link to
+  -$edit_page: (optional) the page to link to in order to edit the entry
+  
+  Uses Bootstrap classes for styling.
+*/
+function get_table($table_params, $items, $html_id, $delete_col=false, $edit_param='', $edit_page='') {
+	$table = '<table id="' . $html_id . '" class="table table-responsive table-hover">' . get_table_header($table_params, $delete_col) . '<tbody>';
 	foreach($items as $item) {
 		$table .= '<tr>';
 		foreach($table_params as $param) {
 			$table .= '<td>';
 			if($param->name == 'date') {
-				$table .= format_date($event->date,'-','/');
+				$table .= format_date($event->date,'d/m/Y');
 			} else if($param->name == $edit_param && !empty($edit_page)) {
-				$path = 'admin.php?page=' . $edit_page . '&id=' . $item->id;
-				$table .= '<a href="' . admin_url($path) . '">' . get_object_vars($item)[$param->name] . '</a>';
+				$table .= get_edit_link(get_object_vars($item)[$param->name], $item->id, $edit_page);
 			} else {
 				$table .= get_object_vars($item)[$param->name];
 			}
@@ -39,6 +74,17 @@ function get_table($table_params, $items, $id, $delete_col=false, $edit_param=''
 	return $table;
 }
 
+/*
+  Wraps the given name with a link to an admin edit page for a table item.
+*/
+function get_edit_link($name, $id, $edit_page) {
+	$rel_path = 'admin.php?page=' . $edit_page . '&id=' . $id;
+	return '<a href="' . admin_url($rel_path) . '">' . $name . '</a>';
+}
+
+/*
+  Creates a <thead> header string for an HTML table.
+*/
 function get_table_header($table_params, $delete) {
   $header = '<thead>';
 	foreach($table_params as $param) {
@@ -51,8 +97,12 @@ function get_table_header($table_params, $delete) {
 	return $header;
 }
 
-function get_basic_form($params, $id, $edit=false, $item=NULL) {
-	$form = '<form id="' . $id . '">';
+/*
+  Returns a basic form (styled with Bootstrap) for adding or updating a
+  table item. 
+*/
+function get_basic_form($params, $form_id, $edit=false, $item=NULL) {
+	$form = '<form id="' . $form_id . '">';
 	foreach($params as $param) {
 		$form .= '<div class="form-group">';
 		$form .= '<label for="' . $param->name . '">' . $param->name . '</label>';
