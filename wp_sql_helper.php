@@ -83,7 +83,7 @@ function save_table_item($table_name, $table_params, $data) {
 	foreach($table_params as $param) {
 		$insert .= $param->name . ',';
 		if($param->name == 'date') {
-	    	$data['date'] = tec_format_date(sanitize_text_field($data['date']),'/','-');
+	    	$data['date'] = format_date(sanitize_text_field($data['date']),'Y-m-d','m/d/Y');
 		}
 		$vals .= '"' . sanitize_text_field($data[$param->name]) . '",';
 	}
@@ -102,12 +102,21 @@ function update_table_item($table_name, $table_params, $data) {
 	$vals = '';
 	foreach($table_params as $param) {
 		if($param->name == 'date') {
-	    	$data['date'] = tec_format_date(sanitize_text_field($data['date']),'/','-');
+	    	$data['date'] = format_date(sanitize_text_field($data['date']),'Y-m-d','m/d/Y');
 		}
 		$vals .= $param->name . '="' . sanitize_text_field($data[$param->name]) . '",';
 	}
 	$vals = substr($vals,0,-1);
 	$query = 'UPDATE ' . $table_name . ' SET ' . $vals . ' WHERE ID=' . $id . ';';
+	return do_query($query);
+}
+
+/* 
+  Deletes from the table any entry that matches the data provided.
+ */
+function delete_table_item($table_name, $data) {
+	$id = $data['id'];
+	$query = 'DELETE FROM ' . $table_name . ' WHERE id=' . $id . ';';
 	return do_query($query);
 }
 
@@ -162,15 +171,6 @@ function get_table_count($table_name) {
 }
 
 /* 
-  Deletes from the table any entry that matches the data provided.
- */
-function delete_table_item($table_name, $data) {
-	$id = $post_data['id'];
-	$query = 'DELETE FROM ' . $table_name . ' WHERE id=' . $id . ';';
-	return do_query($query);
-}
-
-/* 
   Helper function for getting results from the DB.
  */
 function get_results($query) {
@@ -189,8 +189,8 @@ function do_query($query) {
 /* 
   Helper function for formatting dates. 
  */
-function format_date($dateString, $new_format, $format='Y-m-d') {
-	$old_date = DateTime::createFromFormat($format, $dateString);
+function format_date($date, $new_format, $format='Y-m-d') {
+	$old_date = DateTime::createFromFormat($format, $date);
 	return $old_date->format($new_format);
 }
 

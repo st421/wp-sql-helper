@@ -57,7 +57,7 @@ function get_table($table_params, $items, $html_id, $delete_col=false, $edit_par
 		foreach($table_params as $param) {
 			$table .= '<td>';
 			if($param->name == 'date') {
-				$table .= format_date($event->date,'d/m/Y');
+				$table .= format_date($item->date,'m/d/Y');
 			} else if($param->name == $edit_param && !empty($edit_page)) {
 				$table .= get_edit_link(get_object_vars($item)[$param->name], $item->id, $edit_page);
 			} else {
@@ -106,22 +106,30 @@ function get_basic_form($params, $form_id, $edit=false, $item=NULL) {
 	foreach($params as $param) {
 		$form .= '<div class="form-group">';
 		$form .= '<label for="' . $param->name . '">' . $param->name . '</label>';
+		$value = '';
+		if($edit) {
+			if($param->name == 'date') {
+				$value .= format_date($item->date,'m/d/Y');
+			} else {
+				$value .= get_object_vars($item)[$param->name];
+			} 
+		}
 		if($param->name == 'description') {
-			$form .= '<textarea type="text" class="form-control" id="' . $param->name . '" COLS=100 ROWS=5>';
-			if($edit) {
-				$form .= get_object_vars($item)[$param->name];
-			}
-			$form .= '</textarea>';
+			$form .= wrap_with_textarea($param->name, $value);
 		} else {
-			$form .= '<input type="text" class="form-control" id="' . $param->name . '"';
-			if($edit) {
-				$form .= ' value="' . get_object_vars($item)[$param->name] . '"';
-			}
-			$form .= '>';	
+			$form .= wrap_with_input($param->name, $value);
 		}
 		$form .= '</div>';
 	}
 	$form .= '<button type="submit" name="' . $item->id . '" id="submit_form" class="btn">Submit</button></form>';
 	return $form;
+}
+
+function wrap_with_textarea($id, $value, $cols=100, $rows=5) {
+	return '<textarea type="text" class="form-control" id="' . $id . '" COLS=' . $cols . ' ROWS=' . $rows .'>' . $value . '</textarea>';
+}
+
+function wrap_with_input($id, $value) {
+	return '<input type="text" class="form-control" id="' . $id . '" value="' . $value . '">';
 }
 ?>
