@@ -152,15 +152,16 @@ function get_item_by_id($table_name, $id) {
   Returns the items associated with the given parameter.
  */
 function get_items_by_param($table_name, $param_name, $param_value) {
-	return get_results('SELECT value FROM ' . $table_name . ' WHERE ' . $param_name . '="' . $param_value . '";');
+	return get_results('SELECT * FROM ' . $table_name . ' WHERE ' . $param_name . '="' . $param_value . '";');
 }
 
 /* 
   Returns the first item associated with the given parameter.
  */
 function get_item_by_param($table_name, $param_name, $param_value) {
-	return get_items_by_param($table_name, $param_name, $param_value)[0];
+	return get_object_vars(get_items_by_param($table_name, $param_name, $param_value)[0]);
 }
+
 
 /* 
   Returns the number of items in the table.

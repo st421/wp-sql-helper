@@ -54,19 +54,20 @@ function get_table($table_params, $items, $html_id, $delete_col=false, $edit_par
 	$table = '<table id="' . $html_id . '" class="table table-responsive table-hover">' . get_table_header($table_params, $delete_col) . '<tbody>';
 	foreach($items as $item) {
 		$table .= '<tr>';
+		$item = get_object_vars($item);
 		foreach($table_params as $param) {
 			$table .= '<td>';
 			if($param->name == 'date') {
-				$table .= format_date($item->date,'m/d/Y');
+				$table .= format_date($item[$param->name],'m/d/Y');
 			} else if($param->name == $edit_param && !empty($edit_page)) {
-				$table .= get_edit_link(get_object_vars($item)[$param->name], $item->id, $edit_page);
+				$table .= get_edit_link($item[$param->name], $item['id'], $edit_page);
 			} else {
-				$table .= get_object_vars($item)[$param->name];
+				$table .= $item[$param->name];
 			}
 			$table .= '</td>';
 		}
 		if($delete_col) {
-			$table .= '<td id="' . $item->id . '" class="delete"></td>';
+			$table .= '<td id="' . $item['id'] . '" class="delete"></td>';
 		}
 		$table .= '</tr>';
 	}
@@ -111,7 +112,7 @@ function get_basic_form($params, $form_id, $edit=false, $item=NULL) {
 			if($param->name == 'date') {
 				$value .= format_date($item->date,'m/d/Y');
 			} else {
-				$value .= get_object_vars($item)[$param->name];
+				$value .= $item[$param->name];
 			} 
 		}
 		if($param->name == 'description') {
