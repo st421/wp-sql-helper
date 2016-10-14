@@ -23,12 +23,13 @@ class TableField {
 /* 
 	Creates a table with the given name, if one doesn't exist already.
  */
-function create_table($table_name, $table_params, $auto_id=false) {
+function create_table($table_name, $table_params, $auto_id=true) {
 	global $wpdb;
 	$wpdb->show_errors();
+	$charset_collate = $wpdb->get_charset_collate();
 	if(!table_exists($table_name)) {
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		$sql = 'CREATE TABLE ' . $table_name . ' (' . table_sql($table_params, $auto_id) . ');';
+		$sql = "CREATE TABLE " . $table_name . " (\n" . table_sql($table_params, $auto_id) . "\n) " . $charset_collate . ";";
 		dbDelta($sql);
 	}
 }
@@ -44,22 +45,22 @@ function drop_table($table_name) {
   Creates a SQL statement for initialization of the table columns.
  */
 function table_sql($table_params, $auto_id=true) {
-	$sql = '';
+	$sql = "";
 	if($auto_id) {
-		$sql .= 'id int NOT NULL AUTO_INCREMENT,\n';
+		$sql .= "id int(20) NOT NULL AUTO_INCREMENT,\n";
 	}
 	foreach($table_params as $param) {
-		$sql .= $param->name . ' ' . $param->sql . ',\n';
+		$sql .= $param->name . " " . $param->sql . ",\n";
 	}
 	foreach($table_params as $param) {
 		if($param->unique_field) {
-			$sql .= 'UNIQUE  (' . $param->name . '),\n';
+			$sql .= "UNIQUE  (" . $param->name . "),\n";
 		}
 	}
 	if($auto_id) {
-		$sql .= 'PRIMARY KEY  (id)';
+		$sql .= "PRIMARY KEY  (id)";
 	} else {
-		$sql = substr($sql, 0, -2);
+		$sql = substr($sql, 0, -3);
 	}
 	return $sql;
 }
@@ -145,7 +146,7 @@ function get_recent_items($table_name, $num_items) {
   Returns the item associated with the given id.
  */
 function get_item_by_id($table_name, $id) {
-	return get_results('SELECT * FROM ' . $table_name . ' WHERE id=' . $id . ';')[0];
+	return get_object_vars(get_results('SELECT * FROM ' . $table_name . ' WHERE id=' . $id . ';')[0]);
 }
 
 /* 

@@ -110,7 +110,7 @@ function get_basic_form($params, $form_id, $edit=false, $item=NULL) {
 		$value = '';
 		if($edit) {
 			if($param->name == 'date') {
-				$value .= format_date($item->date,'m/d/Y');
+				$value .= format_date($item[$param->name],'m/d/Y');
 			} else {
 				$value .= $item[$param->name];
 			} 
@@ -133,4 +133,29 @@ function wrap_with_textarea($id, $value, $cols=100, $rows=5) {
 function wrap_with_input($id, $value) {
 	return '<input type="text" class="form-control" id="' . $id . '" value="' . $value . '">';
 }
+
+function create_page($page_title, $page_content) {
+	$page = get_page_by_title($page_title);
+	if(!$page) {
+	  $page_id = create_content($page_title, $page_content, 'page');
+	} else {
+		$page_id = $page->ID;
+	  $page->post_status = 'publish';
+	  $page_id = wp_update_post($page);
+	}
+	return $page_id;
+}
+
+function create_content($title, $content, $type = 'post') {
+	$_p = array();
+	$_p['post_title'] = $title;
+	$_p['post_content'] = $content;
+	$_p['post_status'] = 'publish';
+	$_p['post_type'] = $type;
+	$_p['comment_status'] = 'closed';
+	$_p['ping_status'] = 'closed';
+	$page_id = wp_insert_post($_p);
+	return $page_id;
+}
+
 ?>
