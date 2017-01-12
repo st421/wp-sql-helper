@@ -47,7 +47,7 @@ function drop_table($table_name) {
 function table_sql($table_params, $auto_id=true) {
 	$sql = "";
 	if($auto_id) {
-		$sql .= "id int(20) NOT NULL AUTO_INCREMENT,\n";
+		$sql .= "id int NOT NULL AUTO_INCREMENT,\n";
 	}
 	foreach($table_params as $param) {
 		$sql .= $param->name . " " . $param->sql . ",\n";
@@ -138,8 +138,13 @@ function get_all_by_date($table_name) {
 /* 
   Returns the num_items most recent entries from the table.
  */
-function get_recent_items($table_name, $num_items) {
-	return get_results('SELECT * FROM ' . $table_name . ' WHERE date >= DATE_FORMAT(NOW(),"%Y-%m-%d") ORDER BY date ASC LIMIT ' . $num_items . ';');
+function get_recent_items($table_name, $num_items=0) {
+	$query = 'SELECT * FROM ' . $table_name . ' WHERE date >= DATE_FORMAT(NOW(),"%Y-%m-%d") ORDER BY date ASC';
+	if($num_items > 0) {
+		 $query .= ' LIMIT ' . $num_items;
+	}
+	$query .= ';';
+	return get_results($query);
 }
 
 /* 
@@ -171,6 +176,7 @@ function get_table_count($table_name) {
 	$result = get_results('SELECT COUNT(*) as the_count FROM ' . $table_name . ';');
 	return $result[0]->the_count;
 }
+
 
 /* 
   Helper function for getting results from the DB.
