@@ -122,7 +122,7 @@ function get_basic_form($params, $form_id, $edit=false, $item=NULL) {
 		}
 		$form .= '</div>';
 	}
-	$form .= '<button type="submit" name="' . $item->id . '" id="submit_form" class="btn">Submit</button></form>';
+	$form .= '<button type="submit" name="' . $item['id'] . '" id="submit_form" class="btn">Submit</button></form>';
 	return $form;
 }
 

@@ -15,7 +15,6 @@ function add_query_vars($query_vars, $param) {
 function direct_to_template($param, $url, $path) {
   $val = get_query_var($param);
   if($val) {
-    //return $url . '?' . $param . '=' . $val;
     return $url;
   }
   return $path;

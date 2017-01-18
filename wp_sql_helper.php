@@ -78,7 +78,6 @@ function table_exists($table_name) {
   from parameter names to values).
  */
 function save_table_item($table_name, $table_params, $data) {
-	global $wpdb;
 	$insert = '';
 	$vals = '';
 	foreach($table_params as $param) {
